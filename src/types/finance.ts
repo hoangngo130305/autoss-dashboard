@@ -1,12 +1,16 @@
 // ─── Status enums ───────────────────────────────────────────────────────────
 
-export type ReceivableStatus = 'overdue' | 'waiting_payment' | 'waiting_contract' | 'collected';
-export type PayableStatus    = 'overdue' | 'waiting_update' | 'paid' | 'approved';
-export type ProposalStatus   = 'pending' | 'overdue' | 'approved' | 'rejected';
-export type TaxStatus        = 'pending' | 'waiting' | 'overdue' | 'paid' | 'filed';
-export type RiskStatus       = 'approaching' | 'safe' | 'withdrawn';
-export type CashFlowType     = 'in' | 'out';
-export type AccentColor      = 'blue' | 'green' | 'red' | 'amber' | 'indigo';
+export type ReceivableStatus =
+  | "overdue"
+  | "waiting_payment"
+  | "waiting_contract"
+  | "collected";
+export type PayableStatus = "overdue" | "waiting_update" | "paid" | "approved";
+export type ProposalStatus = "pending" | "overdue" | "approved" | "rejected";
+export type TaxStatus = "pending" | "waiting" | "overdue" | "paid" | "filed";
+export type RiskStatus = "approaching" | "safe" | "withdrawn";
+export type CashFlowType = "in" | "out";
+export type AccentColor = "blue" | "green" | "red" | "amber" | "indigo";
 
 // ─── Bank accounts ──────────────────────────────────────────────────────────
 
@@ -53,8 +57,9 @@ export interface Payable {
 
 export interface ExpenseProposal {
   id: string;
-  department: string;
+  department: string; // CHI PHÍ (cost category)
   departmentColor: string;
+  requestDept?: string; // PHÒNG BAN ĐỀ XUẤT (submitting department)
   description: string;
   plannedDate: string;
   isOverdue: boolean;
@@ -90,11 +95,11 @@ export interface CashFlowDay {
 /** Individual transaction record (used for the table) */
 export interface CashFlowTransaction {
   id: string;
-  date: string;        // 'YYYY-MM-DD'
+  date: string; // 'YYYY-MM-DD'
   type: CashFlowType;
   amount: number;
   description: string;
-  account: string;     // 'ACB', 'VCB', 'MB', 'EXIM', 'CASH'
+  account: string; // 'ACB', 'VCB', 'MB', 'EXIM', 'CASH'
   department: string;
 }
 

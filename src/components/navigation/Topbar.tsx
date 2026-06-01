@@ -1,16 +1,9 @@
-import { RefreshCw, Menu } from 'lucide-react';
-import { useState } from 'react';
-import clsx from 'clsx';
-import type { FilterPeriod } from '../../types/common';
-import { useToast } from '../../hooks/useToast';
-import { today } from '../../utils/formatters';
-
-const PERIODS: { id: FilterPeriod; label: string }[] = [
-  { id: 'today',   label: 'Hôm nay' },
-  { id: 'week',    label: 'Tuần' },
-  { id: 'month',   label: 'Tháng' },
-  { id: 'quarter', label: 'Quý' },
-];
+import { RefreshCw, Menu } from "lucide-react";
+import { useState } from "react";
+import clsx from "clsx";
+import { useToast } from "../../hooks/useToast";
+import { useAuth } from "../../context/AuthContext";
+import { today } from "../../utils/formatters";
 
 interface TopbarProps {
   title: string;
@@ -18,21 +11,20 @@ interface TopbarProps {
 }
 
 export function Topbar({ title, onMenuClick }: TopbarProps) {
-  const [period, setPeriod] = useState<FilterPeriod>('today');
   const [spinning, setSpinning] = useState(false);
   const { showToast } = useToast();
+  const { user } = useAuth();
 
   const handleRefresh = () => {
     setSpinning(true);
     setTimeout(() => setSpinning(false), 600);
-    showToast('Đã làm mới dữ liệu', 'success');
+    showToast("Đã làm mới dữ liệu", "success");
   };
 
-  const handlePeriod = (p: FilterPeriod) => {
-    setPeriod(p);
-    const found = PERIODS.find((x) => x.id === p);
-    showToast(`Lọc dữ liệu theo: ${found?.label}`, 'success');
-  };
+  const avatarColor =
+    user?.role === "director"
+      ? "bg-indigo-500/15 border-indigo-500/25 text-indigo-400"
+      : "bg-emerald-500/15 border-emerald-500/25 text-emerald-400";
 
   return (
     <header className="h-14 border-b border-white/7 flex items-center justify-between px-5 bg-surface-2 sticky top-0 z-50 flex-shrink-0">
@@ -47,23 +39,6 @@ export function Topbar({ title, onMenuClick }: TopbarProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="hidden sm:flex items-center bg-surface-3 rounded-lg p-0.5 gap-0.5 border border-white/7">
-          {PERIODS.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => handlePeriod(p.id)}
-              className={clsx(
-                'text-[11px] font-semibold px-3 py-1.5 rounded-md transition-all duration-150',
-                period === p.id
-                  ? 'bg-surface-2 text-ink-1 shadow-card'
-                  : 'text-ink-3 hover:text-ink-2',
-              )}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-
         <span className="hidden sm:block font-mono text-[11px] text-ink-3 bg-surface-3 border border-white/7 px-3 py-1.5 rounded-lg">
           {today()}
         </span>
@@ -73,8 +48,31 @@ export function Topbar({ title, onMenuClick }: TopbarProps) {
           className="w-8 h-8 rounded-lg flex items-center justify-center border border-white/8 bg-surface-3 text-ink-2 hover:text-ink-1 hover:border-white/15 transition-all duration-150"
           title="Làm mới"
         >
-          <RefreshCw size={14} className={clsx('transition-transform duration-500', spinning && 'rotate-180')} />
+          <RefreshCw
+            size={14}
+            className={clsx(
+              "transition-transform duration-500",
+              spinning && "rotate-180",
+            )}
+          />
         </button>
+
+        {/* User chip */}
+        {user && (
+          <div className="hidden sm:flex items-center gap-2 bg-surface-3 border border-white/7 rounded-lg px-2.5 py-1.5">
+            <div
+              className={clsx(
+                "w-5 h-5 rounded-full border flex items-center justify-center text-[9px] font-bold flex-shrink-0",
+                avatarColor,
+              )}
+            >
+              {user.avatar}
+            </div>
+            <span className="text-[11px] font-medium text-ink-2">
+              {user.name}
+            </span>
+          </div>
+        )}
       </div>
     </header>
   );

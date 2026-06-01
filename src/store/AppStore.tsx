@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useMemo } from 'react';
+import { createContext, useContext, useReducer, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type {
   Receivable, Payable, ExpenseProposal,
@@ -24,7 +24,7 @@ interface AppState {
   cashflows:   CashFlowTransaction[];
 }
 
-const initialState: AppState = {
+const staticInitial: AppState = {
   receivables: initReceivables,
   payables:    initPayables,
   proposals:   initProposals,
@@ -32,6 +32,35 @@ const initialState: AppState = {
   reserves:    initReserves,
   cashflows:   initCashflows,
 };
+
+// ─── localStorage persistence ─────────────────────────────────────────────────
+
+const STORAGE_KEY = 'autoss_app_state_v1';
+
+function loadState(): AppState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return staticInitial;
+    const parsed = JSON.parse(raw) as Partial<AppState>;
+    // Merge: keep static data as fallback for any missing key
+    return {
+      receivables: parsed.receivables ?? staticInitial.receivables,
+      payables:    parsed.payables    ?? staticInitial.payables,
+      proposals:   parsed.proposals   ?? staticInitial.proposals,
+      taxes:       parsed.taxes       ?? staticInitial.taxes,
+      reserves:    parsed.reserves    ?? staticInitial.reserves,
+      cashflows:   parsed.cashflows   ?? staticInitial.cashflows,
+    };
+  } catch {
+    return staticInitial;
+  }
+}
+
+function saveState(state: AppState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch { /* quota exceeded or private mode */ }
+}
 
 // ─── Actions ─────────────────────────────────────────────────────────────────
 
@@ -58,7 +87,9 @@ type AppAction =
 
   | { type: 'CASHFLOW_ADD';    payload: CashFlowTransaction }
   | { type: 'CASHFLOW_UPDATE'; payload: { id: string; data: Partial<CashFlowTransaction> } }
-  | { type: 'CASHFLOW_DELETE'; payload: string };
+  | { type: 'CASHFLOW_DELETE'; payload: string }
+
+  | { type: 'RESET_ALL' };
 
 // ─── Reducer ─────────────────────────────────────────────────────────────────
 
@@ -68,35 +99,31 @@ function upsert<T extends { id: string }>(arr: T[], id: string, data: Partial<T>
 
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
-    // Receivables
     case 'RECEIVABLE_ADD':    return { ...state, receivables: [...state.receivables, action.payload] };
     case 'RECEIVABLE_UPDATE': return { ...state, receivables: upsert(state.receivables, action.payload.id, action.payload.data) };
     case 'RECEIVABLE_DELETE': return { ...state, receivables: state.receivables.filter((r) => r.id !== action.payload) };
 
-    // Payables
     case 'PAYABLE_ADD':    return { ...state, payables: [...state.payables, action.payload] };
     case 'PAYABLE_UPDATE': return { ...state, payables: upsert(state.payables, action.payload.id, action.payload.data) };
     case 'PAYABLE_DELETE': return { ...state, payables: state.payables.filter((p) => p.id !== action.payload) };
 
-    // Proposals
     case 'PROPOSAL_ADD':    return { ...state, proposals: [...state.proposals, action.payload] };
     case 'PROPOSAL_UPDATE': return { ...state, proposals: upsert(state.proposals, action.payload.id, action.payload.data) };
     case 'PROPOSAL_DELETE': return { ...state, proposals: state.proposals.filter((p) => p.id !== action.payload) };
 
-    // Taxes
     case 'TAX_ADD':    return { ...state, taxes: [...state.taxes, action.payload] };
     case 'TAX_UPDATE': return { ...state, taxes: upsert(state.taxes, action.payload.id, action.payload.data) };
     case 'TAX_DELETE': return { ...state, taxes: state.taxes.filter((t) => t.id !== action.payload) };
 
-    // Reserves
     case 'RESERVE_ADD':    return { ...state, reserves: [...state.reserves, action.payload] };
     case 'RESERVE_UPDATE': return { ...state, reserves: upsert(state.reserves, action.payload.id, action.payload.data) };
     case 'RESERVE_DELETE': return { ...state, reserves: state.reserves.filter((r) => r.id !== action.payload) };
 
-    // Cashflows
     case 'CASHFLOW_ADD':    return { ...state, cashflows: [action.payload, ...state.cashflows] };
     case 'CASHFLOW_UPDATE': return { ...state, cashflows: upsert(state.cashflows, action.payload.id, action.payload.data) };
     case 'CASHFLOW_DELETE': return { ...state, cashflows: state.cashflows.filter((c) => c.id !== action.payload) };
+
+    case 'RESET_ALL': return staticInitial;
 
     default: return state;
   }
@@ -107,12 +134,11 @@ function appReducer(state: AppState, action: AppAction): AppState {
 interface AppStoreValue {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
-  // Reactive totals (re-computed when state changes)
-  totalReceivable:  number;
-  totalPayable:     number;
-  pendingProposals: number;
-  totalTaxDebt:     number;
-  totalReserve:     number;
+  totalReceivable:    number;
+  totalPayable:       number;
+  pendingProposals:   number;
+  totalTaxDebt:       number;
+  totalReserve:       number;
   overdueReceivables: number;
   overduePayables:    number;
 }
@@ -122,7 +148,10 @@ const AppStoreContext = createContext<AppStoreValue | null>(null);
 // ─── Provider ────────────────────────────────────────────────────────────────
 
 export function AppStoreProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [state, dispatch] = useReducer(appReducer, undefined, loadState);
+
+  // Persist every state change to localStorage
+  useEffect(() => { saveState(state); }, [state]);
 
   const computed = useMemo(() => ({
     totalReceivable: state.receivables
