@@ -1,18 +1,23 @@
 import { Landmark } from 'lucide-react';
 import { SectionCard } from '../../components/cards/SectionCard';
 import { ProgressBar } from '../../components/common/ProgressBar';
-import { bankAccounts, totalBalance, riskReserveAmt } from '../../data/bankAccounts';
+import { riskReserveAmt } from '../../data/bankAccounts';
+import { useStore } from '../../store/AppStore';
 import { formatCurrency } from '../../utils/formatters';
 import { today } from '../../utils/formatters';
 
 export function BankAccountsCard() {
+  const { state } = useStore();
+  const accounts = state.bankAccounts ?? [];
+  const totalBalance = accounts.reduce((s, a) => s + a.balance, 0);
+
   return (
     <SectionCard
       title={<><Landmark size={13} /> Số dư tài khoản ngân hàng</>}
       action={<span className="font-mono text-[10px] text-ink-3">{today()}</span>}
     >
       <div className="space-y-1">
-        {bankAccounts.map((acc) => (
+        {accounts.map((acc) => (
           <div key={acc.id}>
             <div className="flex items-center justify-between py-2">
               <span className="text-[12px] text-ink-2">{acc.name}</span>

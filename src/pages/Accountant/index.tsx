@@ -2,14 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Upload,
-  FilePlus,
-  ClipboardList,
-  TrendingUp,
-  ArrowDownToLine,
-  ArrowUpFromLine,
-  FileText,
-  Receipt,
-  Shield,
   LogOut,
   Download,
 } from "lucide-react";
@@ -17,51 +9,6 @@ import { useAuth } from "../../context/AuthContext";
 import { useStore } from "../../store/AppStore";
 import { exportAccountingReport } from "../../utils/exportAccountingReport";
 import { DataSection } from "./DataSection";
-
-const MODULES = [
-  {
-    id: "receivable",
-    label: "Phải thu (Khách hàng)",
-    icon: <ArrowDownToLine size={16} className="text-emerald-400" />,
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10 border-emerald-500/20",
-  },
-  {
-    id: "payable",
-    label: "Phải trả (Nhà cung cấp)",
-    icon: <ArrowUpFromLine size={16} className="text-red-400" />,
-    color: "text-red-400",
-    bg: "bg-red-500/10 border-red-500/20",
-  },
-  {
-    id: "cashflow",
-    label: "Dòng tiền",
-    icon: <TrendingUp size={16} className="text-blue-400" />,
-    color: "text-blue-400",
-    bg: "bg-blue-500/10 border-blue-500/20",
-  },
-  {
-    id: "proposal",
-    label: "Đề xuất chi phí",
-    icon: <FileText size={16} className="text-amber-400" />,
-    color: "text-amber-400",
-    bg: "bg-amber-500/10 border-amber-500/20",
-  },
-  {
-    id: "tax",
-    label: "Kê khai thuế",
-    icon: <Receipt size={16} className="text-violet-400" />,
-    color: "text-violet-400",
-    bg: "bg-violet-500/10 border-violet-500/20",
-  },
-  {
-    id: "reserve",
-    label: "Dự phòng rủi ro",
-    icon: <Shield size={16} className="text-sky-400" />,
-    color: "text-sky-400",
-    bg: "bg-sky-500/10 border-sky-500/20",
-  },
-];
 
 export default function AccountantHome() {
   const { user, logout } = useAuth();
@@ -163,24 +110,7 @@ export default function AccountantHome() {
         </div>
 
         {/* Quick actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-          <Link
-            to="/ke-toan/nhap-lieu"
-            className="flex items-center gap-4 bg-surface-2 border border-white/8 rounded-xl p-4 hover:bg-surface-3 hover:border-blue-500/20 transition-all group"
-          >
-            <div className="w-10 h-10 rounded-xl bg-blue-500/12 border border-blue-500/20 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/20 transition-colors">
-              <FilePlus size={18} className="text-blue-400" />
-            </div>
-            <div>
-              <p className="text-[13px] font-semibold text-ink-1 group-hover:text-blue-400 transition-colors">
-                Nhập liệu thủ công
-              </p>
-              <p className="text-[11px] text-ink-3 mt-0.5">
-                Thêm bản ghi mới vào từng module
-              </p>
-            </div>
-          </Link>
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
           <Link
             to="/ke-toan/import"
             className="flex items-center gap-4 bg-surface-2 border border-white/8 rounded-xl p-4 hover:bg-surface-3 hover:border-emerald-500/20 transition-all group"
@@ -220,47 +150,6 @@ export default function AccountantHome() {
             </div>
           </button>
         </div>
-
-        {/* Modules */}
-        <div className="bg-surface-2 border border-white/8 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-white/7 flex items-center gap-2">
-            <ClipboardList size={13} className="text-ink-3" />
-            <span className="text-[12px] font-semibold text-ink-1">
-              Module nhập liệu
-            </span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-white/5">
-            {MODULES.map((m) => (
-              <Link
-                key={m.id}
-                to={`/ke-toan/nhap-lieu?module=${m.id}`}
-                className={`flex items-center gap-3 bg-surface-2 px-4 py-3.5 hover:bg-surface-3 transition-colors`}
-              >
-                {m.icon}
-                <span className={`text-[12px] font-medium ${m.color}`}>
-                  {m.label}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Director view note */}
-        {/* <div className="mt-4 bg-indigo-500/8 border border-indigo-500/15 rounded-xl px-4 py-3 flex items-start gap-3">
-          <LayoutDashboard
-            size={14}
-            className="text-indigo-400 flex-shrink-0 mt-0.5"
-          />
-          <div>
-            <p className="text-[12px] font-medium text-indigo-300">
-              Dashboard tổng quan
-            </p>
-            <p className="text-[11px] text-ink-3 mt-0.5">
-              Dashboard phân tích và phê duyệt chỉ dành cho tài khoản Giám Đốc.
-              Liên hệ quản trị nếu cần nâng quyền.
-            </p>
-          </div>
-        </div> */}
 
         {/* Data table */}
         <div className="mt-4">

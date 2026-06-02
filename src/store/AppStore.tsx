@@ -2,7 +2,7 @@ import { createContext, useContext, useReducer, useMemo, useEffect } from 'react
 import type { ReactNode } from 'react';
 import type {
   Receivable, Payable, ExpenseProposal,
-  TaxRecord, RiskReserve, CashFlowTransaction,
+  TaxRecord, RiskReserve, CashFlowTransaction, BankAccount,
 } from '../types/finance';
 
 // Initial data
@@ -12,25 +12,28 @@ import { expenseProposals as initProposals } from '../data/expenseProposals';
 import { taxRecords  as initTaxes       } from '../data/taxRecords';
 import { riskReserves as initReserves   } from '../data/riskReserve';
 import { cashFlowTransactions as initCashflows } from '../data/cashFlow';
+import { bankAccounts as initBankAccounts } from '../data/bankAccounts';
 
 // ─── State ───────────────────────────────────────────────────────────────────
 
 interface AppState {
-  receivables: Receivable[];
-  payables:    Payable[];
-  proposals:   ExpenseProposal[];
-  taxes:       TaxRecord[];
-  reserves:    RiskReserve[];
-  cashflows:   CashFlowTransaction[];
+  receivables:  Receivable[];
+  payables:     Payable[];
+  proposals:    ExpenseProposal[];
+  taxes:        TaxRecord[];
+  reserves:     RiskReserve[];
+  cashflows:    CashFlowTransaction[];
+  bankAccounts: BankAccount[];
 }
 
 const staticInitial: AppState = {
-  receivables: initReceivables,
-  payables:    initPayables,
-  proposals:   initProposals,
-  taxes:       initTaxes,
-  reserves:    initReserves,
-  cashflows:   initCashflows,
+  receivables:  initReceivables,
+  payables:     initPayables,
+  proposals:    initProposals,
+  taxes:        initTaxes,
+  reserves:     initReserves,
+  cashflows:    initCashflows,
+  bankAccounts: initBankAccounts,
 };
 
 // ─── localStorage persistence ─────────────────────────────────────────────────
@@ -44,12 +47,13 @@ function loadState(): AppState {
     const parsed = JSON.parse(raw) as Partial<AppState>;
     // Merge: keep static data as fallback for any missing key
     return {
-      receivables: parsed.receivables ?? staticInitial.receivables,
-      payables:    parsed.payables    ?? staticInitial.payables,
-      proposals:   parsed.proposals   ?? staticInitial.proposals,
-      taxes:       parsed.taxes       ?? staticInitial.taxes,
-      reserves:    parsed.reserves    ?? staticInitial.reserves,
-      cashflows:   parsed.cashflows   ?? staticInitial.cashflows,
+      receivables:  parsed.receivables  ?? staticInitial.receivables,
+      payables:     parsed.payables     ?? staticInitial.payables,
+      proposals:    parsed.proposals    ?? staticInitial.proposals,
+      taxes:        parsed.taxes        ?? staticInitial.taxes,
+      reserves:     parsed.reserves     ?? staticInitial.reserves,
+      cashflows:    parsed.cashflows    ?? staticInitial.cashflows,
+      bankAccounts: parsed.bankAccounts ?? staticInitial.bankAccounts,
     };
   } catch {
     return staticInitial;
@@ -89,6 +93,10 @@ type AppAction =
   | { type: 'CASHFLOW_UPDATE'; payload: { id: string; data: Partial<CashFlowTransaction> } }
   | { type: 'CASHFLOW_DELETE'; payload: string }
 
+  | { type: 'BANKACCOUNT_ADD';    payload: BankAccount }
+  | { type: 'BANKACCOUNT_UPDATE'; payload: { id: string; data: Partial<BankAccount> } }
+  | { type: 'BANKACCOUNT_DELETE'; payload: string }
+
   | { type: 'RESET_ALL' };
 
 // ─── Reducer ─────────────────────────────────────────────────────────────────
@@ -122,6 +130,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
     case 'CASHFLOW_ADD':    return { ...state, cashflows: [action.payload, ...state.cashflows] };
     case 'CASHFLOW_UPDATE': return { ...state, cashflows: upsert(state.cashflows, action.payload.id, action.payload.data) };
     case 'CASHFLOW_DELETE': return { ...state, cashflows: state.cashflows.filter((c) => c.id !== action.payload) };
+
+    case 'BANKACCOUNT_ADD':    return { ...state, bankAccounts: [...state.bankAccounts, action.payload] };
+    case 'BANKACCOUNT_UPDATE': return { ...state, bankAccounts: upsert(state.bankAccounts, action.payload.id, action.payload.data) };
+    case 'BANKACCOUNT_DELETE': return { ...state, bankAccounts: state.bankAccounts.filter((b) => b.id !== action.payload) };
 
     case 'RESET_ALL': return staticInitial;
 
