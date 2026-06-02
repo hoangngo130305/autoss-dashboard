@@ -65,7 +65,7 @@ export default function Receivables() {
   const [search, setSearch] = useState("");
   const [adv, setAdv] = useState<AdvancedFilterState>(EMPTY_FILTERS);
   const { preset, setPreset, custom, setCustom, isInRange } =
-    useDateFilter("30days");
+    useDateFilter("thisyear");
   const { showToast } = useToast();
 
   const filtered = useMemo(() => {

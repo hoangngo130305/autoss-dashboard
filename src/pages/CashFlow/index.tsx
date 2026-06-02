@@ -57,7 +57,9 @@ export default function CashFlow() {
   // Gom theo ngày cho chart
   const chartData: CashFlowDay[] = useMemo(() => {
     const map = new Map<string, CashFlowDay>();
-    filtered.forEach((tx) => {
+    // Sort by YYYY-MM-DD first so Map insertion order = chronological order
+    const sorted = [...filtered].sort((a, b) => a.date.localeCompare(b.date));
+    sorted.forEach((tx) => {
       const [, m, d] = tx.date.split("-");
       const label = `${d}/${m}`;
       if (!map.has(label))
@@ -66,9 +68,7 @@ export default function CashFlow() {
       if (tx.type === "in") e.income += tx.amount;
       else e.expense += tx.amount;
     });
-    return Array.from(map.values()).sort((a, b) =>
-      a.date.localeCompare(b.date),
-    );
+    return Array.from(map.values());
   }, [filtered]);
 
   // Gom theo ngày cho bảng kê (Thu / Chi / Tồn quỹ)

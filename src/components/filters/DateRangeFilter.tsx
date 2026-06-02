@@ -50,6 +50,12 @@ const FULL_PRESET_GROUPS: { label: string; items: { id: DatePreset; label: strin
   },
 ];
 
+// All presets flattened for mobile scroll row
+const ALL_FULL_PRESETS = [
+  ...FULL_PRESET_GROUPS.flatMap((g) => g.items),
+  { id: "custom" as DatePreset, label: "Tùy chỉnh" },
+];
+
 function PresetBtn({
   id,
   label,
@@ -87,35 +93,53 @@ export function DateRangeFilter({
   return (
     <div className="flex flex-col gap-2">
       {full ? (
-        <div className="flex flex-col gap-2">
-          {FULL_PRESET_GROUPS.map((group) => (
-            <div key={group.label} className="flex items-center gap-2 flex-wrap">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-ink-3 w-14 flex-shrink-0">
-                {group.label}
-              </span>
-              <div className="flex gap-1 flex-wrap">
-                {group.items.map((p) => (
-                  <PresetBtn
-                    key={p.id}
-                    id={p.id}
-                    label={p.label}
-                    active={preset === p.id}
-                    onClick={() => onPreset(p.id)}
-                  />
-                ))}
-              </div>
+        <>
+          {/* Mobile: single scrollable row */}
+          <div className="sm:hidden overflow-x-auto pb-0.5 -mx-1 px-1">
+            <div className="flex gap-1 w-max">
+              {ALL_FULL_PRESETS.map((p) => (
+                <PresetBtn
+                  key={p.id}
+                  id={p.id}
+                  label={p.label}
+                  active={preset === p.id}
+                  onClick={() => onPreset(p.id)}
+                />
+              ))}
             </div>
-          ))}
-          <div className="flex items-center gap-2">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-ink-3 w-14 flex-shrink-0" />
-            <PresetBtn
-              id="custom"
-              label="Tùy chỉnh"
-              active={preset === "custom"}
-              onClick={() => onPreset("custom")}
-            />
           </div>
-        </div>
+
+          {/* Desktop: grouped rows with labels */}
+          <div className="hidden sm:flex flex-col gap-2">
+            {FULL_PRESET_GROUPS.map((group) => (
+              <div key={group.label} className="flex items-center gap-2 flex-wrap">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-ink-3 w-14 flex-shrink-0">
+                  {group.label}
+                </span>
+                <div className="flex gap-1 flex-wrap">
+                  {group.items.map((p) => (
+                    <PresetBtn
+                      key={p.id}
+                      id={p.id}
+                      label={p.label}
+                      active={preset === p.id}
+                      onClick={() => onPreset(p.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-bold uppercase tracking-widest text-ink-3 w-14 flex-shrink-0" />
+              <PresetBtn
+                id="custom"
+                label="Tùy chỉnh"
+                active={preset === "custom"}
+                onClick={() => onPreset("custom")}
+              />
+            </div>
+          </div>
+        </>
       ) : (
         <div className="flex items-center gap-2 flex-wrap">
           <CalendarDays size={13} className="text-ink-3 flex-shrink-0" />
@@ -134,7 +158,7 @@ export function DateRangeFilter({
       )}
 
       {preset === "custom" && (
-        <div className="flex items-center gap-1.5 ml-16">
+        <div className="flex items-center gap-1.5 sm:ml-16 flex-wrap">
           <input
             type="date"
             value={custom.start}

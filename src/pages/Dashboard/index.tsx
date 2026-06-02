@@ -99,32 +99,23 @@ export default function Dashboard() {
   return (
     <div className="space-y-5">
       {/* Date filter */}
-      <div className="bg-surface-2 border border-white/8 rounded-xl px-4 py-3.5">
-        <div className="flex items-start gap-3">
-          <CalendarDays
-            size={13}
-            className="text-blue-400 mt-1 flex-shrink-0"
-          />
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2.5">
-              <span className="text-[11px] font-semibold text-ink-2">
-                Kỳ phân tích
-              </span>
-              {rangeLabel && (
-                <span className="text-[10px] text-ink-3 font-mono bg-surface-3 px-2 py-0.5 rounded">
-                  {rangeLabel}
-                </span>
-              )}
-            </div>
-            <DateRangeFilter
-              preset={preset}
-              custom={custom}
-              onPreset={setPreset}
-              onCustom={setCustom}
-              full
-            />
-          </div>
+      <div className="bg-surface-2 border border-white/8 rounded-xl px-3 py-3 sm:px-4 sm:py-3.5">
+        <div className="flex items-center gap-2 mb-2.5">
+          <CalendarDays size={12} className="text-blue-400 flex-shrink-0" />
+          <span className="text-[11px] font-semibold text-ink-2">Kỳ phân tích</span>
+          {rangeLabel && (
+            <span className="text-[10px] text-ink-3 font-mono bg-surface-3 px-2 py-0.5 rounded ml-auto sm:ml-0">
+              {rangeLabel}
+            </span>
+          )}
         </div>
+        <DateRangeFilter
+          preset={preset}
+          custom={custom}
+          onPreset={setPreset}
+          onCustom={setCustom}
+          full
+        />
       </div>
 
       {/* KPI cards — period-based */}

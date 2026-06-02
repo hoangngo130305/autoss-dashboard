@@ -38,7 +38,7 @@ const staticInitial: AppState = {
 
 // ─── localStorage persistence ─────────────────────────────────────────────────
 
-const STORAGE_KEY = 'autoss_app_state_v1';
+const STORAGE_KEY = 'autoss_app_state_v2';
 
 function loadState(): AppState {
   try {

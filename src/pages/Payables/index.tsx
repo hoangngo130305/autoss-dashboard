@@ -51,7 +51,7 @@ export default function Payables() {
   const [search, setSearch] = useState("");
   const [adv, setAdv] = useState<AdvancedFilterState>(EMPTY_FILTERS);
   const { preset, setPreset, custom, setCustom, isInRange } =
-    useDateFilter("30days");
+    useDateFilter("thisyear");
   const modal = useModal<string>();
   const { showToast } = useToast();
 
