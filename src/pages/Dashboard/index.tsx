@@ -85,22 +85,26 @@ export default function Dashboard() {
       ? {
           label: `${analytics.pendingProposals.length} đề xuất chờ duyệt`,
           value: formatShortCurrency(
-            analytics.pendingProposals.reduce(
-              (s, p) => s + (p.amount ?? 0),
-              0,
-            ),
+            analytics.pendingProposals.reduce((s, p) => s + (p.amount ?? 0), 0),
           ),
           type: "warn" as const,
         }
       : null,
-  ].filter(Boolean) as { label: string; value: string; type: "danger" | "warn" }[];
+  ].filter(Boolean) as {
+    label: string;
+    value: string;
+    type: "danger" | "warn";
+  }[];
 
   return (
     <div className="space-y-5">
       {/* Date filter */}
       <div className="bg-surface-2 border border-white/8 rounded-xl px-4 py-3.5">
         <div className="flex items-start gap-3">
-          <CalendarDays size={13} className="text-blue-400 mt-1 flex-shrink-0" />
+          <CalendarDays
+            size={13}
+            className="text-blue-400 mt-1 flex-shrink-0"
+          />
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2.5">
               <span className="text-[11px] font-semibold text-ink-2">
@@ -345,7 +349,10 @@ export default function Dashboard() {
                     ? (r.amount / analytics.totalReceivable) * 100
                     : 0;
                 return (
-                  <div key={r.id} className="px-4 py-2.5 hover:bg-surface-3 transition-colors">
+                  <div
+                    key={r.id}
+                    className="px-4 py-2.5 hover:bg-surface-3 transition-colors"
+                  >
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="text-[10px] font-mono text-ink-3 w-4 flex-shrink-0">

@@ -3,10 +3,7 @@ import type { AppState } from "../store/AppStore";
 import type { DateRange, DatePreset } from "./useDateFilter";
 import { getPreviousRange } from "./useDateFilter";
 
-function filterByRange(
-  cashflows: AppState["cashflows"],
-  range: DateRange,
-) {
+function filterByRange(cashflows: AppState["cashflows"], range: DateRange) {
   if (!range.start || !range.end) return cashflows;
   return cashflows.filter(
     (tx) => tx.date >= range.start && tx.date <= range.end,
@@ -14,9 +11,7 @@ function filterByRange(
 }
 
 function sumType(txs: AppState["cashflows"], type: "in" | "out") {
-  return txs
-    .filter((t) => t.type === type)
-    .reduce((s, t) => s + t.amount, 0);
+  return txs.filter((t) => t.type === type).reduce((s, t) => s + t.amount, 0);
 }
 
 function pctChange(curr: number, prev: number): number | null {
