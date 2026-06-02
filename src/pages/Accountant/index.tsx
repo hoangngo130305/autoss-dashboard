@@ -4,7 +4,6 @@ import {
   Upload,
   FilePlus,
   ClipboardList,
-  LayoutDashboard,
   TrendingUp,
   ArrowDownToLine,
   ArrowUpFromLine,
@@ -17,6 +16,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { useStore } from "../../store/AppStore";
 import { exportAccountingReport } from "../../utils/exportAccountingReport";
+import { DataSection } from "./DataSection";
 
 const MODULES = [
   {
@@ -246,7 +246,7 @@ export default function AccountantHome() {
         </div>
 
         {/* Director view note */}
-        <div className="mt-4 bg-indigo-500/8 border border-indigo-500/15 rounded-xl px-4 py-3 flex items-start gap-3">
+        {/* <div className="mt-4 bg-indigo-500/8 border border-indigo-500/15 rounded-xl px-4 py-3 flex items-start gap-3">
           <LayoutDashboard
             size={14}
             className="text-indigo-400 flex-shrink-0 mt-0.5"
@@ -260,6 +260,11 @@ export default function AccountantHome() {
               Liên hệ quản trị nếu cần nâng quyền.
             </p>
           </div>
+        </div> */}
+
+        {/* Data table */}
+        <div className="mt-4">
+          <DataSection />
         </div>
       </main>
     </div>
